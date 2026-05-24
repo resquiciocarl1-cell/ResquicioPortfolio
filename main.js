@@ -106,5 +106,3 @@ if (lightbox) {
 
     lightbox.addEventListener('click', closeLightbox);
 }
-
-
