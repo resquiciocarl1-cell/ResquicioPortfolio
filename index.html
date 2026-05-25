@@ -1,476 +1,504 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Carl Gabriel Resquicio — IT Student & Web Developer specializing in digital solutions, database systems, and user-centered design.">
-    <title>Carl Gabriel Resquicio | IT Portfolio</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Paresalamat</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍲</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
 
-    <!-- ── HEADER ── -->
-    <header id="site-header">
-        <a href="index.html" class="logo" aria-label="Carl Gabriel Resquicio — Home">
-            <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            </svg>
-            <span class="logo-text">Carl Resquicio</span>
-        </a>
-        <nav aria-label="Main navigation">
-            <ul class="nav-links">
-                <li><a href="#about">About</a></li>
-                <li><a href="#expertise">Skills</a></li>
-                <li><a href="#portfolio">Work</a></li>
-                <li><a href="#experiences">Projects</a></li>
-                <li><a href="#resume">Resume</a></li>
-                <li><a href="#contact">Contact</a></li>
-            </ul>
-        </nav>
-        <a href="#contact" class="cta-btn">Let's connect <span aria-hidden="true">→</span></a>
-        <button class="hamburger" id="hamburger" aria-label="Toggle navigation" aria-expanded="false">
-            <span></span><span></span><span></span>
-        </button>
-    </header>
+  <div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+  <aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-header">
+      <h2> Your Order</h2>
+      <button class="cart-close" onclick="toggleCart()">✕</button>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <p class="cart-empty">Your cart is empty.<br/>Start adding some pares!</p>
+    </div>
+    <div class="cart-footer" id="cartFooter" style="display:none;">
+      <div class="cart-subtotal">
+        <span>Subtotal</span>
+        <span id="cartSubtotal">₱0</span>
+      </div>
+      <div class="cart-delivery-info">
+        <label>
+          <input type="radio" name="orderType" value="pickup" checked onchange="updateOrderType(this)"/> Pickup
+        </label>
+        <label>
+          <input type="radio" name="orderType" value="delivery" onchange="updateOrderType(this)"/> Delivery (+₱60)
+        </label>
+      </div>
+      <div class="cart-total">
+        <span>Total</span>
+        <span id="cartTotal">₱0</span>
+      </div>
+      <button class="btn-checkout" onclick="openGcashModal()">Proceed to Checkout</button>
+    </div>
+  </aside>
 
-    <!-- Mobile nav overlay -->
-    <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
-        <ul>
-            <li><a href="#about" class="mobile-link">About</a></li>
-            <li><a href="#expertise" class="mobile-link">Skills</a></li>
-            <li><a href="#portfolio" class="mobile-link">Work</a></li>
-            <li><a href="#experiences" class="mobile-link">Projects</a></li>
-            <li><a href="#resume" class="mobile-link">Resume</a></li>
-            <li><a href="#contact" class="mobile-link">Contact</a></li>
-        </ul>
+  <div class="modal-overlay" id="gcashModal">
+    <div class="modal-box" style="text-align: center;">
+      <button class="modal-close" onclick="closeGcashModal()">✕</button>
+      <h2>Pay via GCash</h2>
+      <p style="color: var(--text-light); font-size: 0.95rem; margin-bottom: 1.5rem;">
+        Scan the QR code below to pay. <br/><strong>Please save a screenshot of your receipt!</strong>
+      </p>
+      <img src="GcashQR.jpg" alt="GCash QR Code" style="max-width: 100%; max-height: 350px; border-radius: 16px; margin-bottom: 1.5rem; box-shadow: var(--shadow-soft);" />
+      <button class="btn-checkout" onclick="proceedToForm()">I have paid, continue</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="checkoutModal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeCheckout()">✕</button>
+      <h2>Complete Your Order</h2>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="custName" placeholder="Juan dela Cruz" />
+      </div>
+      <div class="form-group">
+        <label>Phone Number</label>
+        <input type="tel" id="custPhone" placeholder="09XXXXXXXXX" />
+      </div>
+      <div class="form-group" id="addressGroup" style="display:none;">
+        <label>Delivery Address</label>
+        <textarea id="custAddress" placeholder="House No., Street, Barangay, City"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Special Instructions (optional)</label>
+        <textarea id="custNotes" placeholder="e.g. Extra soup, less spice…"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Proof of Payment (Screenshot)</label>
+        <input type="file" id="proofImage" accept="image/*" style="background: var(--white); padding: 0.5rem;" />
+        <small style="color: var(--red); font-size: 0.8rem; display: block; margin-top: 0.4rem; font-weight: 700;">
+          *Important: WhatsApp cannot auto-attach images. Please hit 'Send' on the photo once the chat opens.
+        </small>
+      </div>
+      <div class="order-summary-mini" id="orderSummaryMini"></div>
+      <button class="btn-checkout" onclick="placeOrder()"> Place Order via WhatsApp</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-box success-box">
+      <div class="success-icon"></div>
+      <h2>Order Sent!</h2>
+      <p>Your order has been forwarded. We'll confirm shortly via call or message.</p>
+      <button class="btn-checkout" onclick="closeSuccess()">Back to Menu</button>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="imageModal" onclick="closeImageModal()">
+    <button class="modal-close" style="top: 1.5rem; right: 1.5rem; background: var(--white); color: var(--text-dark); width: 40px; height: 40px; font-size: 1.2rem;" onclick="closeImageModal()">✕</button>
+    <img id="lightboxImage" src="" alt="Gallery Focus" class="lightbox-img" onclick="event.stopPropagation()" />
+  </div>
+
+  <nav class="navbar" id="navbar">
+    <a href="#home" class="nav-logo">
+      <span class="logo-text">Pares<em>alamat</em></span>
+    </a>
+    <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" onclick="closeMenu()">Home</a></li>
+      <li><a href="#menu" onclick="closeMenu()">Order</a></li>
+      <li><a href="#about" onclick="closeMenu()">About Us</a></li>
+      <li><a href="#gallery" onclick="closeMenu()">Gallery</a></li>
+      <li><a href="#feedback" onclick="closeMenu()">Reviews</a></li>
+      <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+    </ul>
+    <button class="nav-cart-btn" onclick="toggleCart()">
+       <span class="cart-badge" id="cartBadge">0</span>
+    </button>
+  </nav>
+
+  <section class="hero" id="home">
+    <div class="hero-blobs">
+      <div class="blob blob-1"></div>
+      <div class="blob blob-2"></div>
+      <div class="blob blob-3"></div>
+    </div>
+    <div class="hero-content">
+      <div class="hero-tag"> Valenzuela's Finest</div>
+      <h1 class="hero-title">PARES<span>ALAMAT</span></h1>
+      <p class="hero-sub">Legendary beef pares that hits different. Rich broth. Tender meat. Unbeatable value.</p>
+      <div class="hero-cta">
+        <a href="#menu" class="btn-primary">Order Now</a>
+        <a href="#about" class="btn-ghost">Our Story</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><strong>500+</strong><span>Daily Customers</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong>9</strong><span>Menu Items</span></div>
+        <div class="stat-divider"></div>
+        <div class="stat"><strong> 4.9</strong><span>Rating</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-bowl-card">
+        <div class="best-seller-badge">⭐ Best Seller</div>
+        <img src="fourth's_bowl.jpg" alt="Fourth's Bowl" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; margin: 0 auto 0.5rem; display: block;" />
+        <p>Fourth's Bowl</p>
+        <strong>₱229</strong>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <span>Scroll to explore</span>
+      <div class="scroll-arrow">↓</div>
+    </div>
+  </section>
+
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span> Pares Mami</span><span> Siomai Rice</span><span> Pares</span>
+      <span> Pares Mata</span><span> Pares Utak</span><span> Basic Overload</span>
+      <span> All-In Overload</span><span> Fourth's Bowl</span>
+      <span> Pares Mami</span><span> Siomai Rice</span><span> Pares</span>
+      <span> Pares Mata</span><span> Pares Utak</span><span> Basic Overload</span>
+      <span> All-In Overload</span><span> Fourth's Bowl</span>
+    </div>
+  </div>
+
+  <!-- ===== DEMO REEL SECTION ===== -->
+  <section class="reel-section" id="reel">
+    <div class="section-header">
+      <div class="section-tag">Watch &amp; Crave</div>
+      <h2>See the <span>Legend</span> in Action</h2>
+      <p>A quick look at what makes every bowl unforgettable</p>
+    </div>
+    <div class="reel-wrapper" id="reelWrapper">
+      <video
+        class="reel-video"
+        id="reelVideo"
+        src="lv_0_20260524141007(1).mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+        poster="fourth's_bowl.jpg"
+      ></video>
+      <div class="reel-overlay">
+        <button class="reel-play-btn" id="reelPlayBtn" onclick="toggleReel()">
+          <span id="reelIcon">🔇</span>
+        </button>
+        <div class="reel-badge">🍲 Paresalamat – Valenzuela's Finest</div>
+      </div>
+    </div>
+  </section>
+  <!-- ===== END DEMO REEL ===== -->
+
+  <section class="menu-section" id="menu">
+    <div class="section-header">
+      <div class="section-tag">Our Menu</div>
+      <h2>Choose Your <span>Pares</span></h2>
+      <p>Fresh, made-to-order bowls crafted with love and heritage</p>
     </div>
 
-    <main>
+    <div class="menu-filters">
+      <button class="filter-btn active" data-filter="all">All</button>
+      <button class="filter-btn" data-filter="budget">Budget Picks</button>
+      <button class="filter-btn" data-filter="classic">Classic</button>
+      <button class="filter-btn" data-filter="overload">Overload</button>
+      <button class="filter-btn" data-filter="special">Special</button>
+    </div>
 
-    <!-- ── HERO ── -->
-    <section class="hero" aria-label="Introduction">
-        <div class="hero-eyebrow reveal">
-            <span class="dot" aria-hidden="true"></span>
-            Available for opportunities
-        </div>
-        <h1 class="hero-name reveal delay-1">
-            Carl Gabriel<br><em>Resquicio</em>
-        </h1>
-        <p class="hero-sub reveal delay-2">
-            IT Student &amp; Aspiring Developer — crafting digital solutions
-            with clean code, thoughtful design, and a focus on real impact.
-        </p>
-        <div class="hero-actions reveal delay-3">
-            <a href="#portfolio" class="btn-primary">View My Work</a>
-            <a href="#about" class="btn-ghost">Learn More</a>
-        </div>
-        <div class="hero-stats reveal delay-4" aria-label="At a glance">
-            <div class="stat">
-                <strong>4</strong>
-                <span>Technical<br>Projects</span>
-            </div>
-            <div class="stat-divider" aria-hidden="true"></div>
-            <div class="stat">
-                <strong>5</strong>
-                <span>Core<br>Competencies</span>
-            </div>
-            <div class="stat-divider" aria-hidden="true"></div>
-            <div class="stat">
-                <strong>IT</strong>
-                <span>Student<br>Developer</span>
-            </div>
-        </div>
-        <div class="hero-image-wrap reveal delay-2">
-            <img src="Formal pic.png" alt="Carl Gabriel Resquicio" class="hero-photo">
-        </div>
-        <div class="scroll-cue reveal delay-4" aria-hidden="true">
-            Scroll <span>↓</span>
-        </div>
-    </section>
+    <div class="menu-grid" id="menuGrid">
+    </div>
+  </section>
 
-    <!-- ── ABOUT ── -->
-    <section id="about" class="about" aria-labelledby="about-heading">
-        <div class="about-inner">
-            <div class="about-text">
-                <span class="section-label">About Me</span>
-                <h2 id="about-heading" class="reveal">Professional<br>Summary</h2>
-                <p class="reveal delay-1">
-                    I specialize in translating complex technical requirements into scalable, functional
-                    solutions. My approach combines a strong foundation in IT principles with a focus on
-                    efficiency and user-centric design. I am actively seeking opportunities to apply my
-                    technical skills to real-world challenges.
-                </p>
-                <div class="about-points">
-                    <div class="point-item reveal delay-2">
-                        <span class="point-num" aria-hidden="true">01</span>
-                        <p>Committed to developing clean, maintainable code and intuitive user interfaces that address specific business needs.</p>
-                    </div>
-                    <div class="point-item reveal delay-3">
-                        <span class="point-num" aria-hidden="true">02</span>
-                        <p>Experienced in conceptualizing and managing the full lifecycle of academic technology projects — from database planning to frontend execution.</p>
-                    </div>
-                </div>
-            </div>
-            <div class="about-aside reveal delay-2">
-                <div class="about-card">
-                    <span class="about-card-label">Currently studying</span>
-                    <p class="about-card-value">Information Technology</p>
-                </div>
-                <div class="about-card">
-                    <span class="about-card-label">Based in</span>
-                    <p class="about-card-value">Valenzuela, Metro Manila</p>
-                </div>
-                <div class="about-card">
-                    <span class="about-card-label">Focus areas</span>
-                    <p class="about-card-value">Web Dev · Databases · UI/UX</p>
-                </div>
-                <div class="about-card accent-card">
-                    <span class="about-card-label">Open to</span>
-                    <p class="about-card-value">Internships &amp; Freelance Projects</p>
-                </div>
-            </div>
+  <section class="about-section" id="about">
+    <div class="about-blob"></div>
+    <div class="about-grid">
+      <div class="about-visual">
+        <div class="about-img-wrap">
+          <div class="about-badge">Est. 2020</div>
+          <div class="about-img-placeholder" style="background: transparent; padding: 0;">
+            <img src="Story.png" alt="Paresalamat Story" style="width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-xl);" />
+          </div>
         </div>
-    </section>
-
-    <!-- ── EXPERTISE ── -->
-    <section id="expertise" class="expertise" aria-labelledby="expertise-heading">
-        <div class="section-header">
-            <span class="section-label reveal">Technical Capabilities</span>
-            <h2 id="expertise-heading" class="reveal delay-1">Core IT Competencies</h2>
+        <div class="about-mini-cards">
+          <div class="mini-card">
+            <span>🏆</span>
+            <strong>Best Pares</strong>
+            <p>Valenzuela 2020</p>
+          </div>
+          <div class="mini-card">
+            <span>🌿</span>
+            <strong>All Natural</strong>
+            <p>No preservatives</p>
+          </div>
         </div>
-        <div class="competency-grid">
-            <article class="competency-card reveal" aria-label="Web Development">
-                <span class="comp-num" aria-hidden="true">01</span>
-                <h3>Web Development</h3>
-                <p>Engineering responsive, cross-platform web applications using modern semantic HTML5 and CSS3 layout methodologies.</p>
-                <span class="comp-tag">HTML · CSS</span>
-            </article>
-            <article class="competency-card reveal delay-1" aria-label="Database Management">
-                <span class="comp-num" aria-hidden="true">02</span>
-                <h3>Database Management</h3>
-                <p>Architecting and normalizing relational database schemas to ensure data integrity, security, and efficient query performance.</p>
-                <span class="comp-tag">SQL</span>
-            </article>
-            <article class="competency-card reveal delay-2" aria-label="UI/UX Design">
-                <span class="comp-num" aria-hidden="true">03</span>
-                <h3>UI/UX Design</h3>
-                <p>Implementing usability heuristics and user-centered design principles to streamline navigation and enhance user experience.</p>
-                <span class="comp-tag">Prototyping</span>
-            </article>
-            <article class="competency-card reveal delay-3" aria-label="Systems Troubleshooting">
-                <span class="comp-num" aria-hidden="true">04</span>
-                <h3>Systems Troubleshooting</h3>
-                <p>Systematically identifying, analyzing, and resolving technical discrepancies within application logic and infrastructure.</p>
-                <span class="comp-tag">Debugging</span>
-            </article>
-            <article class="competency-card reveal delay-4" aria-label="Digital Asset Integration">
-                <span class="comp-num" aria-hidden="true">05</span>
-                <h3>Digital Asset Integration</h3>
-                <p>Processing and optimizing multimedia assets to maintain performance budgets without sacrificing visual fidelity.</p>
-                <span class="comp-tag">Photoshop</span>
-            </article>
-        </div>
-
-        <div class="focus-grid">
-            <div class="section-header" style="margin-top:5rem;">
-                <h2 class="reveal">Academic Focus Areas</h2>
-            </div>
-            <div class="focus-list">
-                <div class="focus-item reveal"><span>Frontend Architecture</span><span class="focus-tag">Client-Side</span></div>
-                <div class="focus-item reveal delay-1"><span>Relational Data Systems</span><span class="focus-tag">Backend</span></div>
-                <div class="focus-item reveal delay-2"><span>Interaction Design</span><span class="focus-tag">Prototyping</span></div>
-                <div class="focus-item reveal delay-3"><span>Digital Composition</span><span class="focus-tag">Asset Management</span></div>
-                <div class="focus-item reveal delay-4"><span>Requirements Analysis</span><span class="focus-tag">Planning</span></div>
-                <div class="focus-item reveal"><span>IT Infrastructure</span><span class="focus-tag">General Tech</span></div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── PORTFOLIO ── -->
-    <section id="portfolio" class="portfolio-section" aria-labelledby="portfolio-heading">
-        <div class="section-header">
-            <span class="section-label reveal">Project Portfolio</span>
-            <h2 id="portfolio-heading" class="reveal delay-1">Technical Implementations</h2>
-        </div>
-        <div class="project-grid">
-            <a href="paresalamat.html" class="project-card reveal" aria-label="Restaurant UI Implementation — view project">
-                <div class="project-img-wrap">
-                    <img src="paresalamat.jpg" alt="Paresalamat Restaurant Interface" class="project-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="project-img-fallback" aria-hidden="true">
-                        <span>Paresalamat</span>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <div>
-                        <span class="project-type">Frontend Mock-up</span>
-                        <h3>Restaurant UI Implementation</h3>
-                    </div>
-                    <div class="project-tags">
-                        <span class="tag">UI/UX</span>
-                        <span class="tag">HTML/CSS</span>
-                    </div>
-                </div>
-                <div class="project-arrow" aria-hidden="true">→</div>
-            </a>
-            <a href="inventory.html" class="project-card reveal delay-1" aria-label="Inventory Dashboard — view project">
-                <div class="project-img-wrap">
-                    <img src="SQL.png" alt="Inventory Database System" class="project-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="project-img-fallback" aria-hidden="true">
-                        <span>Inventory DB</span>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <div>
-                        <span class="project-type">Database Management</span>
-                        <h3>Inventory Dashboard</h3>
-                    </div>
-                    <div class="project-tags">
-                        <span class="tag">Database</span>
-                        <span class="tag">SQL</span>
-                    </div>
-                </div>
-                <div class="project-arrow" aria-hidden="true">→</div>
-            </a>
-            <a href="multimedia.html" class="project-card reveal delay-2" aria-label="Multimedia Case Study — view project">
-                <div class="project-img-wrap">
-                    <img src="photoshop.jpg" alt="Multimedia Design Assets" class="project-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-                    <div class="project-img-fallback" aria-hidden="true">
-                        <span>Multimedia</span>
-                    </div>
-                </div>
-                <div class="project-info">
-                    <div>
-                        <span class="project-type">Graphic Design</span>
-                        <h3>Multimedia Case Study</h3>
-                    </div>
-                    <div class="project-tags">
-                        <span class="tag">Branding</span>
-                        <span class="tag">Photoshop</span>
-                    </div>
-                </div>
-                <div class="project-arrow" aria-hidden="true">→</div>
-            </a>
-        </div>
-    </section>
-
-    <!-- ── EXPERIENCES ── -->
-    <section id="experiences" class="experiences" aria-labelledby="exp-heading">
-        <div class="experiences-header">
+      </div>
+      <div class="about-content">
+        <div class="section-tag">Our Legacy</div>
+        <h2>More Than Just <span>Pares</span></h2>
+        <p>Paresalamat was born from a simple dream in 2020 — to bring the true soul of traditional Filipino beef pares to the bustling streets of Valenzuela. We set out to create a welcoming place built on honesty, unparalleled quality, and highly affordable prices that absolutely everyone in the community can enjoy, from hardworking students to busy professionals craving a hearty late-night comfort meal.</p>
+        <p>Every single bowl we serve carries decades of rich culinary tradition. We believe that truly great food takes time. That is why our premium beef brisket is meticulously slow-cooked for over 12 hours, simmering gently in an incredibly aromatic broth infused with star anise, roasted garlic, and our closely guarded secret family spice blend. It is served steaming hot with our signature sinangag (fried garlic rice) and that unforgettable sweet-savory glaze that keeps our loyal customers coming back day after day.</p>
+        <p>From our humble, passionate beginnings in a small corner at the Arrhelyn Building on Maysan Road, Paresalamat has rapidly grown into a beloved local landmark for anyone craving authentic, comforting Filipino food. We treat every customer like family, ensuring that every bite feels exactly like home. Whether you are looking for a quick budget-friendly bite or a legendary overload feast, you will always find a warm welcome waiting for you here.</p>
+        <div class="about-values">
+          <div class="value-item">
+            <span class="value-icon">🍲</span>
             <div>
-                <span class="section-label reveal">History</span>
-                <h2 id="exp-heading" class="reveal delay-1">Academic Project<br>History</h2>
+              <strong>Slow-Cooked Daily</strong>
+              <p>Fresh, massive batches prepared every single morning using only the most premium cuts of meat.</p>
             </div>
-            <p class="reveal delay-2">
-                Throughout my academic career, I've collaborated on various technical
-                projects, applying theoretical IT concepts to practical design and
-                development scenarios.<br><br>
-                <a href="#contact" class="text-link">Request Full Resume →</a>
-            </p>
+          </div>
+          <div class="value-item">
+            <span class="value-icon">💰</span>
+            <div>
+              <strong>Budget-Friendly</strong>
+              <p>Unbeatable, wallet-friendly value starting at only ₱40, perfectly priced for students and workers alike.</p>
+            </div>
+          </div>
+          <div class="value-item">
+            <span class="value-icon">🤝</span>
+            <div>
+              <strong>Community First</strong>
+              <p>Proudly serving the wonderful Valenzuela community with endless passion, dedication, and love.</p>
+            </div>
+          </div>
         </div>
-        <ul class="experience-list" aria-label="Project list">
-            <li class="experience-item reveal">
-                <div class="exp-main">
-                    <span class="exp-year">2024</span>
-                    <div>
-                        <h3>Restaurant Interface Deployment</h3>
-                        <p class="exp-details">Valenzuela, Metro Manila — Frontend UI/UX project for a local restaurant concept, focusing on clean layout and responsive design.</p>
-                    </div>
-                </div>
-                <div class="exp-right">
-                    <span class="tag">UI/UX</span>
-                    <span class="tag">Development</span>
-                    <a href="paresalamat.html" class="exp-more" aria-label="View Restaurant project">→</a>
-                </div>
-            </li>
-            <li class="experience-item reveal delay-1">
-                <div class="exp-main">
-                    <span class="exp-year">2024</span>
-                    <div>
-                        <h3>Inventory Database Schema</h3>
-                        <p class="exp-details">Valenzuela, Metro Manila — Designed and normalized a relational database for inventory tracking, integrating SQL queries with a web frontend.</p>
-                    </div>
-                </div>
-                <div class="exp-right">
-                    <span class="tag">Database</span>
-                    <span class="tag">SQL</span>
-                    <a href="inventory.html" class="exp-more" aria-label="View Inventory project">→</a>
-                </div>
-            </li>
-            <li class="experience-item experience-item--featured reveal delay-2">
-                <div class="exp-main">
-                    <span class="exp-year">2024</span>
-                    <div>
-                        <h3>Multimedia Asset Suite</h3>
-                        <p class="exp-details">Independent Academic Project — Designed and optimized high-fidelity graphical assets for web integration, ensuring strict adherence to performance and aesthetic standards.</p>
-                        <div class="exp-images">
-                        </div>
-                    </div>
-                </div>
-                <div class="exp-right">
-                    <span class="tag tag--dark">Branding</span>
-                    <span class="tag tag--dark">Design</span>
-                    <a href="multimedia.html" class="exp-more" aria-label="View Multimedia project">→</a>
-                </div>
-            </li>
+      </div>
+    </div>
+  </section>
+
+  <section class="gallery-section" id="gallery">
+    <div class="section-header">
+      <div class="section-tag">Gallery</div>
+      <h2>See Our <span>Bowls</span></h2>
+      <p>Food that speaks for itself</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item gi-large" onclick="openImageModal('all_in_overload.jpg')">
+        <div class="gallery-placeholder" style="background: transparent; padding: 0;">
+          <img src="all_in_overload.jpg" alt="All-In Overload Bowl" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div class="gallery-label">All-In Overload</div>
+      </div>
+      <div class="gallery-item" onclick="openImageModal('fourth\'s_bowl.jpg')">
+        <div class="gallery-placeholder" style="background: transparent; padding: 0;">
+          <img src="fourth's_bowl.jpg" alt="Fourth's Bowl – Wagyu" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div class="gallery-label">Fourth's Bowl</div>
+      </div>
+      <div class="gallery-item" onclick="openImageModal('pares_mami.jpg')">
+        <div class="gallery-placeholder" style="background: transparent; padding: 0;">
+          <img src="pares_mami.jpg" alt="Pares Mami" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div class="gallery-label">Pares Mami</div>
+      </div>
+      <div class="gallery-item gi-wide" onclick="openImageModal('Basic_Overload.jpg')">
+        <div class="gallery-placeholder" style="background: transparent; padding: 0;">
+          <img src="Basic_Overload.jpg" alt="Siomai Rice" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div class="gallery-label">Siomai Rice</div>
+      </div>
+      <div class="gallery-item" onclick="openImageModal('pares_mata.jpg')">
+        <div class="gallery-placeholder" style="background: transparent; padding: 0;">
+          <img src="pares_mata.jpg" alt="Pares Mata" style="width: 100%; height: 100%; object-fit: cover;" />
+        </div>
+        <div class="gallery-label">Pares Mata</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="faq-section" id="faq">
+    <div class="section-header">
+      <div class="section-tag">Got Questions?</div>
+      <h2>Frequently Asked <span>Questions</span></h2>
+      <p>Everything you need to know about your favorite pares.</p>
+    </div>
+    <div class="faq-grid">
+      <div class="faq-item fade-up">
+        <h4>Do you offer delivery services outside of Valenzuela City?</h4>
+        <p>Currently, our direct hot delivery focuses exclusively on Valenzuela City and immediately surrounding areas to ensure your pares arrives piping hot, fresh, and ready to eat. However, bulk orders and specialized catering requests for outer regions can absolutely be arranged with prior notice. Just send us a message!</p>
+      </div>
+      <div class="faq-item fade-up">
+        <h4>What exactly makes your legendary beef pares different from others?</h4>
+        <p>It all comes down to our meticulous slow-cooking process and our highly guarded secret family spice blend. We carefully simmer our premium beef cuts for over 12 hours until they literally melt in your mouth. We absolutely never use cheap shortcuts or artificial thickeners—just pure, hearty, incredibly traditional flavor in every single bite.</p>
+      </div>
+      <div class="faq-item fade-up">
+        <h4>Can I easily order in advance for large gatherings, events, or office parties?</h4>
+        <p>Absolutely! We absolutely love feeding a hungry crowd. For large orders of 10 bowls or more, we highly recommend messaging us at least 24 hours in advance via our official Facebook page or WhatsApp number. We will prepare everything perfectly portioned and securely packed for your special event.</p>
+      </div>
+      <div class="faq-item fade-up">
+        <h4>Are your meat and fresh ingredients sourced locally?</h4>
+        <p>Yes, 100%! We are incredibly proud to support our hard-working local Valenzuela markets and farmers. Our premium beef, farm-fresh vegetables, and aromatic spices are sourced daily from highly trusted local vendors to guarantee maximum freshness, superior quality, and to continuously support the community that built us.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="feedback-section" id="feedback">
+    <div class="section-header">
+      <div class="section-tag">Reviews</div>
+      <h2>What Our <span>Customers</span> Say</h2>
+      <p>Real love from real pares fans</p>
+    </div>
+    
+    <div style="position: relative; max-width: 1000px; margin: 0 auto 3rem auto; padding: 0 40px;">
+      <button onclick="scrollReviews(-1)" style="position: absolute; left: 0; top: 50%; transform: translateY(-50%); background: #8B0000; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; z-index: 10; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s;" onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">‹</button>
+
+      <div id="reviewsGrid" style="display: flex; gap: 1.5rem; overflow-x: auto; scroll-behavior: smooth; padding: 1rem 0; scrollbar-width: none; -ms-overflow-style: none; scroll-snap-type: x mandatory;">
+        <style>#reviewsGrid::-webkit-scrollbar { display: none; }</style>
+      </div>
+
+      <button onclick="scrollReviews(1)" style="position: absolute; right: 0; top: 50%; transform: translateY(-50%); background: #8B0000; color: white; border: none; border-radius: 50%; width: 40px; height: 40px; cursor: pointer; z-index: 10; font-size: 1.5rem; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.2s;" onmouseover="this.style.transform='translateY(-50%) scale(1.1)'" onmouseout="this.style.transform='translateY(-50%) scale(1)'">›</button>
+    </div>
+
+    <div class="leave-review">
+      <h3>Leave a Review </h3>
+      <p>Enjoyed your meal? We'd love to hear from you!</p>
+      <div class="review-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Your Name</label>
+            <input type="text" id="reviewerName" placeholder="Juan dela Cruz" />
+          </div>
+          <div class="form-group">
+            <label>Rating</label>
+            <div class="star-rating" id="starRating">
+              <span data-val="1">★</span>
+              <span data-val="2">★</span>
+              <span data-val="3">★</span>
+              <span data-val="4">★</span>
+              <span data-val="5">★</span>
+            </div>
+            <input type="hidden" id="ratingVal" value="0" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Your Review</label>
+          <textarea id="reviewText" placeholder="Tell us about your experience…" rows="4"></textarea>
+        </div>
+        <button class="btn-primary" onclick="submitReview()">Submit Review</button>
+        <div class="review-success" id="reviewSuccess" style="display:none;"> Thank you for your review!</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="contact-section" id="contact">
+    <div class="section-header">
+      <div class="section-tag">Get In Touch</div>
+      <h2>Contact <span>Us</span></h2>
+    </div>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-card">
+          <span class="contact-icon"></span>
+          <div>
+            <strong>Location</strong>
+            <p>Paresalamat, Arrhelyn Building<br/>Maysan Road cor Oreta St.<br/>Maysan, Valenzuela City</p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <span class="contact-icon"></span>
+          <div>
+            <strong>Phone / WhatsApp</strong>
+            <p><a href="tel:09948243867">0994 824 3867</a></p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <span class="contact-icon"></span>
+          <div>
+            <strong>Operating Hours</strong>
+            <p>Daily: 6:00 AM – 10:00 PM</p>
+          </div>
+        </div>
+        <div class="contact-card">
+          <span class="contact-icon"></span>
+          <div>
+            <strong>Social Media</strong>
+            <p>
+              <a href="https://www.facebook.com/share/18bCZEDxGX/" target="_blank" class="social-link">Facebook</a> ·
+              <a href="https://www.instagram.com/paresalamat.biz?igsh=MThtdmNodjl0cHR1bw==" target="_blank" class="social-link">Instagram</a>
+            </p>
+          </div>
+        </div>
+
+        <div class="message-form">
+          <h3>Send a Message</h3>
+          <div class="form-group">
+            <label>Name</label>
+            <input type="text" id="msgName" placeholder="Your name" />
+          </div>
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="msgEmail" placeholder="your@email.com" />
+          </div>
+          <div class="form-group">
+            <label>Message</label>
+            <textarea id="msgBody" rows="4" placeholder="Questions, catering inquiries, feedback…"></textarea>
+          </div>
+          <button class="btn-primary" onclick="sendMessage()">Send Message</button>
+          <div class="msg-success" id="msgSuccess" style="display:none;"> Message sent! We'll get back to you soon.</div>
+        </div>
+      </div>
+
+      <div class="map-container">
+        <div class="map-placeholder">
+          <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3858.1!2d120.9668!3d14.6807!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTTCsDQwJzUwLjUiTiAxMjDCsDU4JzAwLjUiRQ!5e0!3m2!1sen!2sph!4v1700000000000!5m2!1sen!2sph"
+            width="100%"
+            height="400"
+            style="border:0; border-radius: 16px;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            title="Paresalamat Location Map">
+          </iframe>
+        </div>
+        <div class="map-pin-card">
+          <strong> Paresalamat</strong>
+          <p>Arrhelyn Building, Maysan, Valenzuela City</p>
+          <a href="https://maps.google.com/?q=Maysan+Valenzuela+City" target="_blank" class="btn-ghost" style="margin-top:0.75rem; display:inline-block;">Open in Maps ↗</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">Pares<em>alamat</em></div>
+        <p>Legendary pares. Unbeatable value. Straight from Valenzuela's heart.</p>
+      </div>
+      
+      <div class="footer-links-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="#home">Home</a></li>
+          <li><a href="#menu">Order Now</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#feedback">Reviews</a></li>
+          <li><a href="#contact">Contact</a></li>
         </ul>
-    </section>
+      </div>
 
-    <!-- ── RESUME ── -->
-    <section id="resume" class="resume-section" aria-labelledby="resume-heading">
-        <div class="section-header">
-            <span class="section-label reveal">Curriculum Vitae</span>
-            <h2 id="resume-heading" class="reveal delay-1">Background & Details</h2>
-        </div>
-        
-        <div class="resume-grid">
-            <!-- Left Column: Education & Experience -->
-            <div class="resume-col">
-                <h3 class="resume-category reveal">Education</h3>
-                
-                <div class="resume-item reveal delay-1">
-                    <span class="resume-year">Present</span>
-                    <div class="resume-content">
-                        <h4>Bachelor of Science in Information Technology</h4>
-                        <p>Pamantasan ng Lungsod ng Valenzuela (2nd Year)</p>
-                    </div>
-                </div>
-                
-                <div class="resume-item reveal delay-2">
-                    <span class="resume-year">2023 – 2024</span>
-                    <div class="resume-content">
-                        <h4>Senior High School</h4>
-                        <p>Emmaus Christian School Inc., Valenzuela City</p>
-                    </div>
-                </div>
+      <div class="footer-links-col">
+        <h4>Contact</h4>
+        <ul>
+          <li>Maysan, Valenzuela City</li>
+          <li><a href="tel:09948243867">0994 824 3867</a></li>
+          <li>6:00 AM – 10:00 PM</li>
+          <li>Open Daily</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>© 2024 Paresalamat. All rights reserved. Made with ❤ in Valenzuela.</p>
+    </div>
+  </footer>
 
-                <div class="resume-item reveal delay-3">
-                    <span class="resume-year">2018 – 2023</span>
-                    <div class="resume-content">
-                        <h4>Junior High School</h4>
-                        <p>Emmaus Christian School Inc., Valenzuela City</p>
-                    </div>
-                </div>
-
-                <div class="resume-item reveal delay-4">
-                    <span class="resume-year">2010 – 2018</span>
-                    <div class="resume-content">
-                        <h4>Elementary & Preschool</h4>
-                        <p>Coloong Elementary School, Valenzuela City</p>
-                    </div>
-                </div>
-
-                <h3 class="resume-category reveal" style="margin-top: 3rem;">Experience</h3>
-                
-                <div class="resume-item reveal delay-1">
-                    <span class="resume-year">1 Year</span>
-                    <div class="resume-content">
-                        <h4>IT Support</h4>
-                        <p>Emmaus Christian School Inc.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Right Column: Awards & Personal Info -->
-            <div class="resume-col">
-                <h3 class="resume-category reveal">Awards & Recognitions</h3>
-                
-                <div class="resume-item reveal delay-1">
-                    <span class="resume-year">2024</span>
-                    <div class="resume-content">
-                        <h4>With Honors</h4>
-                        <p>Grade 12</p>
-                    </div>
-                </div>
-                
-                <div class="resume-item reveal delay-2">
-                    <span class="resume-year">2023</span>
-                    <div class="resume-content">
-                        <h4>With Honors</h4>
-                        <p>Grade 11</p>
-                    </div>
-                </div>
-                
-                <div class="resume-item reveal delay-3">
-                    <span class="resume-year">2018</span>
-                    <div class="resume-content">
-                        <h4>Best in Math & Science</h4>
-                        <p>Grade 6</p>
-                    </div>
-                </div>
-
-                <h3 class="resume-category reveal" style="margin-top: 3rem;">Personal Details</h3>
-                
-                <div class="resume-details-card reveal delay-1">
-                    <ul class="details-list">
-                        <li><span>Birthdate</span> November 23, 2005</li>
-                        <li><span>Age</span> 20 years old</li>
-                        <li><span>Sex</span> Male</li>
-                        <li><span>Nationality</span> Filipino</li>
-                        <li><span>Religion</span> Roman Catholic</li>
-                        <li class="details-list-full">
-                            <span>Address</span> 
-                            788 Coloong 1, Mendoza St. Valenzuela City
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- ── CONTACT ── -->
-    <section id="contact" class="contact" aria-labelledby="contact-heading">
-        <div class="contact-inner">
-            <span class="section-label reveal">Get In Touch</span>
-            <h2 id="contact-heading" class="reveal delay-1">Let's Work<br>Together</h2>
-            <p class="reveal delay-2">
-                I'm currently open to internship opportunities, freelance projects, and
-                collaborative work. Feel free to reach out — I'd love to connect.
-            </p>
-            <div class="contact-links reveal delay-3">
-                <a href="https://www.facebook.com/carl.resquicio.2025" target="_blank" rel="noopener noreferrer" class="contact-card">
-                    <span class="contact-icon" aria-hidden="true">FB</span>
-                    <div>
-                        <span class="contact-label">Facebook</span>
-                        <span class="contact-value">facebook.com/carl.resquicio.2025</span>
-                    </div>
-                </a>
-                <a href="https://github.com/resquiciocarl1-cell" target="_blank" rel="noopener noreferrer" class="contact-card">
-                    <span class="contact-icon" aria-hidden="true">GH</span>
-                    <div>
-                        <span class="contact-label">GitHub</span>
-                        <span class="contact-value">github.com/resquiciocarl1</span>
-                    </div>
-                </a>
-                <a href="https://www.linkedin.com/in/carl-resquicio-714592368/" target="_blank" rel="noopener noreferrer" class="contact-card">
-                    <span class="contact-icon" aria-hidden="true">IN</span>
-                    <div>
-                        <span class="contact-label">LinkedIn</span>
-                        <span class="contact-value">linkedin.com/in/resquiciocarl1</span>
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    </main>
-
-    <!-- ── FOOTER ── -->
-    <footer class="site-footer">
-        <div class="footer-inner">
-            <a href="index.html" class="footer-logo" aria-label="Back to top">RESQUICIO</a>
-            <nav aria-label="Footer navigation">
-                <ul class="footer-nav">
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#portfolio">Work</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
-            <p class="footer-copy">© 2026 Carl Gabriel Resquicio.</p>
-        </div>
-    </footer>
-
-    <script src="main.js"></script>
+  <script src="script.js"></script>
 </body>
 </html>
