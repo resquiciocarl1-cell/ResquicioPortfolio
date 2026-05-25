@@ -1,4 +1,4 @@
-// ── SCROLL REVEAL ────────────────────────────────────
+// SCROLL REVEAL 
 const revealObserver = new IntersectionObserver(
     (entries) => {
         entries.forEach((entry) => {
@@ -14,7 +14,7 @@ document.querySelectorAll('.reveal').forEach((el) => {
     revealObserver.observe(el);
 });
 
-// ── HEADER SCROLL SHADOW ─────────────────────────────
+// HEADER SCROLL SHADOW 
 const header = document.getElementById('site-header');
 if (header) {
     window.addEventListener('scroll', () => {
@@ -22,7 +22,7 @@ if (header) {
     }, { passive: true });
 }
 
-// ── HAMBURGER MENU ───────────────────────────────────
+// HAMBURGER MENU
 const hamburger = document.getElementById('hamburger');
 const mobileNav = document.getElementById('mobile-nav');
 if (hamburger && mobileNav) {
@@ -44,7 +44,7 @@ if (hamburger && mobileNav) {
     });
 }
 
-// ── ACTIVE NAV HIGHLIGHT ─────────────────────────────
+// ACTIVE NAV HIGHLIGHT 
 const sections = document.querySelectorAll('section[id]');
 const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
 if (sections.length && navLinks.length) {
@@ -67,14 +67,17 @@ if (sections.length && navLinks.length) {
     sections.forEach((sec) => navObserver.observe(sec));
 }
 
-// ── LIGHTBOX ─────────────────────────────────────────
+// SLOW-MO LIGHTBOX
 const lightbox = document.getElementById('lightbox');
 const lightboxImg = document.getElementById('lightbox-img');
 const galleryImages = document.querySelectorAll('.gallery-img-box img');
 if (lightbox) {
     galleryImages.forEach(img => {
         img.addEventListener('click', () => {
+            // 1. Show the flex container first
             lightbox.style.display = 'flex';
+            
+            // 2. Use a timeout so the browser registers the display change 
             setTimeout(() => {
                 lightbox.classList.add('open');
                 lightboxImg.src = img.src;
@@ -83,8 +86,10 @@ if (lightbox) {
         });
     });
     const closeLightbox = () => {
+        // 1. Remove the open class to trigger the 0.8s CSS transition
         lightbox.classList.remove('open');
         document.body.style.overflow = 'auto';
+        // 2. Wait for CSS transition (800ms) to finish before hiding the div
         setTimeout(() => {
             if (!lightbox.classList.contains('open')) {
                 lightbox.style.display = 'none';
@@ -94,31 +99,18 @@ if (lightbox) {
     lightbox.addEventListener('click', closeLightbox);
 }
 
-// ── DEMO REEL ─────────────────────────────────────────
-function toggleReel() {
-    const video   = document.getElementById('reelVideo');
-    const icon    = document.getElementById('reelIcon');
-    const wrapper = document.getElementById('reelWrapper');
-
-    if (!video) return;
-
-    // First click: unmute — overlay fades out
-    if (video.muted) {
-        video.muted  = false;
-        video.volume = 1;
-        icon.textContent = '⏸';
-        wrapper.classList.add('active');
-        return;
-    }
-
-    // Subsequent clicks: pause / play
-    if (video.paused) {
-        video.play();
-        icon.textContent = '⏸';
-        wrapper.classList.add('active');
-    } else {
-        video.pause();
-        icon.textContent = '▶';
-        wrapper.classList.remove('active');
-    }
+// DEMO REEL VIDEO CONTROLS
+const demoVideo = document.getElementById('demo-video');
+const videoOverlay = document.getElementById('video-overlay');
+if (demoVideo && videoOverlay) {
+    videoOverlay.addEventListener('click', () => {
+        videoOverlay.classList.add('hidden');
+        demoVideo.play();
+    });
+    demoVideo.addEventListener('pause', () => {
+        videoOverlay.classList.remove('hidden');
+    });
+    demoVideo.addEventListener('ended', () => {
+        videoOverlay.classList.remove('hidden');
+    });
 }
